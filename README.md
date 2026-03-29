@@ -72,14 +72,8 @@ import time
 
 kanji_list = [
     {"kanji": "済", "level": "N3"},
-    {"kanji": "学", "level": "N5"},
-    {"kanji": "水", "level": "N5"},
-    {"kanji": "火", "level": "N5"},
-    {"kanji": "山", "level": "N5"},
-    {"kanji": "経", "level": "N2"},
-    {"kanji": "調", "level": "N2"},
-    {"kanji": "策", "level": "N1"},
-    {"kanji": "詳", "level": "N1"}
+    {"kanji": "訳", "level": "N1"},
+    {"kanji": "翻", "level": "N1"}
 ]
 
 random.shuffle(kanji_list)
@@ -210,14 +204,8 @@ import time
 
 kanji_list = [
     {"kanji": "済", "level": "N3"},
-    {"kanji": "学", "level": "N5"},
-    {"kanji": "水", "level": "N5"},
-    {"kanji": "火", "level": "N5"},
-    {"kanji": "山", "level": "N5"},
-    {"kanji": "経", "level": "N2"},
-    {"kanji": "調", "level": "N2"},
-    {"kanji": "策", "level": "N1"},
-    {"kanji": "詳", "level": "N1"}
+    {"kanji": "訳", "level": "N1"},
+    {"kanji": "翻", "level": "N1"}
 ]
 
 random.shuffle(kanji_list)
