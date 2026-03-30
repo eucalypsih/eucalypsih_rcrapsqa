@@ -103,6 +103,216 @@ def main(stdscr):
 curses.wrapper(main)
 
 ```
+```python
+# kuis 1 baris
+# without module textwrap
+import curses, urllib.parse, random, time
+
+kanji_list = [{"kanji": "済", "level": "N3"}, {"kanji": "訳", "level": "N1"}, {"kanji": "翻", "level": "N1"}]
+random.shuffle(kanji_list)
+
+score, lives = 0, 1
+total = len(kanji_list)
+time_per_question = 60
+
+def main(stdscr):
+    global score, lives
+    curses.curs_set(0)
+    stdscr.nodelay(True)
+    max_y, max_x = stdscr.getmaxyx()
+
+    def show_message(msg):
+        stdscr.clear()
+        # Jika pesan terlalu panjang, tampilkan bagian tertentu agar tidak keluar layar
+        if len(msg) > max_x * (max_y - 1):
+            msg = msg[:max_x * (max_y - 1)]  # Potong agar sesuai layar
+        lines = msg.splitlines()
+        for i, line in enumerate(lines):
+            if i >= max_y:
+                break
+            stdscr.addstr(i, 0, line)
+        stdscr.refresh()
+
+    def wait_for_enter_or_timeout(timeout):
+        start = time.time()
+        while True:
+            ch = stdscr.getch()
+            if ch in (10, 13):  # Enter
+                break
+            if time.time() - start > timeout:
+                break
+            time.sleep(0.1)
+
+    # Sambutan awal
+    show_message("Tekan Enter untuk mulai...")
+    wait_for_enter_or_timeout(5)
+
+    for i, item in enumerate(kanji_list, 1):
+        if lives <= 0:
+            show_message("Nyawa habis! Game Over 💀")
+            time.sleep(2)
+            break
+        kanji, level = item["kanji"], item["level"]
+        # Tampilkan soal
+        show_message(f"Soal {i}/{total}: Kanji '{kanji}' (Level {level}). Tekan Enter untuk soal...")
+        wait_for_enter_or_timeout(5)
+        show_message(f"Apa URL-encoded dari '{kanji}' ?")
+        wait_for_enter_or_timeout(5)
+
+        # Input jawaban
+        user_input = ""
+        start_time = time.time()
+        while True:
+            elapsed = time.time() - start_time
+            remaining = int(time_per_question - elapsed)
+            if remaining <= 0:
+                user_input = None
+                break
+            show_message(f"Jawaban: {user_input}\nWaktu tersisa: {remaining}s")
+            ch = stdscr.getch()
+            if ch == -1:
+                time.sleep(0.1)
+                continue
+            elif ch in (10, 13):
+                break
+            elif ch in (8, 127, 263):
+                user_input = user_input[:-1]
+            elif 0 <= ch <= 255:
+                user_input += chr(ch)
+
+        # Evaluasi
+        if user_input is None:
+            lives -= 1
+            show_message("⏰ Waktu habis! Nyawa berkurang.")
+        else:
+            decoded = urllib.parse.unquote(user_input)
+            if decoded == kanji:
+                score += 1
+                show_message("✅ Benar! Jawaban tepat.")
+            else:
+                lives -= 1
+                show_message(f"❌ Salah! Jawaban benar: {urllib.parse.quote(kanji)}")
+        time.sleep(5)
+
+    # Hasil akhir
+    show_message(f"Hasil: {score}/{total} | Nyawa tersisa: {lives}")
+    if score == total:
+        show_message("Sempurna! 🔥")
+    elif score >= total // 2:
+        show_message("Lumayan 👍")
+    else:
+        show_message("Perlu latihan lagi 💪")
+    time.sleep(3)
+
+curses.wrapper(main)
+
+```
+
+```python
+# kuis 1 baris
+# with module textwrap
+import curses, urllib.parse, random, time
+import textwrap
+
+kanji_list = [{"kanji": "済", "level": "N3"}, {"kanji": "訳", "level": "N1"}, {"kanji": "翻", "level": "N1"}]
+random.shuffle(kanji_list)
+
+score, lives = 0, 1
+total = len(kanji_list)
+time_per_question = 60
+
+def main(stdscr):
+    global score, lives  # Tambahkan deklarasi ini
+    curses.curs_set(0)
+    stdscr.nodelay(True)
+    max_y, max_x = stdscr.getmaxyx()
+
+    def wrap_text(text, width):
+        return textwrap.wrap(text, width)
+
+    def show_message(msg):
+        stdscr.clear()
+        lines = wrap_text(msg, max_x - 1)
+        for i, line in enumerate(lines):
+            if i >= max_y:
+                break
+            stdscr.addstr(i, 0, line)
+        stdscr.refresh()
+
+    def wait_for_enter_or_timeout(timeout):
+        start = time.time()
+        while True:
+            ch = stdscr.getch()
+            if ch in (10, 13):  # Enter
+                break
+            if time.time() - start > timeout:
+                break
+            time.sleep(0.1)
+
+    # Sambutan awal
+    show_message("Tekan Enter untuk mulai...")
+    wait_for_enter_or_timeout(5)
+
+    for i, item in enumerate(kanji_list, 1):
+        if lives <= 0:
+            show_message("Nyawa habis! Game Over 💀")
+            time.sleep(2)
+            break
+        kanji, level = item["kanji"], item["level"]
+        # Tampilkan soal
+        show_message(f"Soal {i}/{total}: Kanji '{kanji}' (Level {level}). Tekan Enter untuk soal...")
+        wait_for_enter_or_timeout(5)
+        show_message(f"Apa URL-encoded dari '{kanji}' ?")
+        wait_for_enter_or_timeout(5)
+
+        # Input jawaban
+        user_input = ""
+        start_time = time.time()
+        while True:
+            elapsed = time.time() - start_time
+            remaining = int(time_per_question - elapsed)
+            if remaining <= 0:
+                user_input = None
+                break
+            show_message(f"Jawaban: {user_input} | Waktu tersisa: {remaining}s")
+            ch = stdscr.getch()
+            if ch == -1:
+                time.sleep(0.1)
+                continue
+            elif ch in (10, 13):
+                break
+            elif ch in (8, 127, 263):
+                user_input = user_input[:-1]
+            elif 0 <= ch <= 255:
+                user_input += chr(ch)
+
+        # Evaluasi
+        if user_input is None:
+            lives -= 1
+            show_message("⏰ Waktu habis! Nyawa berkurang.")
+        else:
+            decoded = urllib.parse.unquote(user_input)
+            if decoded == kanji:
+                score += 1
+                show_message("✅ Benar! Jawaban tepat.")
+            else:
+                lives -= 1
+                show_message(f"❌ Salah! Jawaban benar: {urllib.parse.quote(kanji)}")
+        time.sleep(5)
+
+    # Hasil akhir
+    show_message(f"Hasil: {score}/{total} | Nyawa tersisa: {lives}")
+    if score == total:
+        show_message("Sempurna! 🔥")
+    elif score >= total // 2:
+        show_message("Lumayan 👍")
+    else:
+        show_message("Perlu latihan lagi 💪")
+    time.sleep(3)
+
+curses.wrapper(main)
+
+```
 
 ```python
 import urllib.parse
